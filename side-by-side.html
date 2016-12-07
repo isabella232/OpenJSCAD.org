@@ -36,14 +36,18 @@
 	</head>
 	<body>
 		<div style="display: flex;">
-			<div style="flex: 1; height: calc(100vh - 4em); position: relative;">
+			<div style="flex: 1; height: calc(100vh - 7em); position: relative;">
 				<div>THREE.js</div>
 				<div id="viewer-1" style="width: 100%; height: 100%"></div>
 			</div>
-			<div style="flex: 1; height: calc(100vh - 4em); position: relative;">
+			<div style="flex: 1; height: calc(100vh - 7em); position: relative;">
 				<div>lightgl.js</div>
 				<div id="viewer-2" style="width: 100%; height: 100%"></div>
 			</div>
+		</div>
+		<div style="margin-top: 3em;">
+			<div><button id="slide-left">⇇</button><button id="up">↑</button><button id="slide-right">⇉</button></div>
+			<div><button id="left">←</button><button id="down">↓</button><button id="right">→</button></div>
 		</div>
 
 		<script type="text/javascript">
@@ -125,6 +129,16 @@
 			);
 
 			gProcessor2.setJsCad( jscadscript, 'samples/logo.jscad' );
+
+			var upBtn = document.querySelector ('button#up');
+			upBtn.addEventListener ("click", function () {
+				console.log (gProcessor.viewer.angleX, gProcessor2.viewer.angleX);
+				gProcessor.viewer.angleX = gProcessor.viewer.angleX + 45;
+				gProcessor.viewer.render ();
+
+				gProcessor2.viewer.angleX = gProcessor2.viewer.angleX + 45;
+				gProcessor2.viewer.onDraw ();
+			});
 		</script>
 	</body>
 </html>

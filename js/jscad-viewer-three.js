@@ -255,6 +255,7 @@ OpenJsCad.Viewer.ThreeEngine.prototype = {
     // play here for different start zoom
     this.camera_.position.set(d*2, d*2, d);
     this.camera_.zoom = 1;
+    console.log (this.camera_, this.scene_);
     this.camera_.lookAt(this.scene_.position);
     this.camera_.updateProjectionMatrix();
   },
