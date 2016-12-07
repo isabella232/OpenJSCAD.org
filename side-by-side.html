@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+
+		<link rel="shortcut icon" href="imgs/favicon.png" type="image/x-png">
+		<link rel="stylesheet" href="jquery/themes/base/jquery-ui.css" />
+		<link rel="stylesheet" href="style.css?0.5.2" type="text/css">
+		<link rel="stylesheet" href="openjscad.css?0.5.2" type="text/css">
+
+		<script src="jquery/jquery-1.9.1.js"></script>
+		<script src="jquery/jquery-ui.js"></script>
+		<script src="jquery/jquery.hammer.js"></script>
+		<script src="lightgl.js"></script>
+		<script src="csg.js?0.5.2"></script>
+		<script src="formats.js?0.5.2"></script>
+		<script src="openjscad.js?0.5.2"></script>
+		<script src="js/jscad-viewer.js?0.5.2" charset="utf-8"></script>
+		<script src="js/jscad-viewer-lightgl.js?0.5.2" charset="utf-8"></script>
+		<script src="js/jscad-worker.js?0.5.2" charset="utf-8"></script>
+		<script src="js/jscad-function.js?0.5.2" charset="utf-8"></script>
+		<script src="openscad.js?0.5.2"></script>
+		<script src="underscore.js"></script>
+		<script src="openscad-openjscad-translator.js"></script>
+
+
+		<script type="text/javascript" src="three/three.min.js"></script>
+		<script type="text/javascript" src="three/orbitcontrols.js"></script>
+		<script type="text/javascript" src="three/projector.js"></script>
+		<script type="text/javascript" src="three/canvasrenderer.js"></script>
+		<script type="text/javascript" src="three/threecsg.js"></script>
+		<script type="text/javascript" src="js/jscad-viewer-three.js?0.5.2" charset="utf-8"></script>
+
+		<!--script src="../test.js"></script-->
+		<title></title>
+	</head>
+	<body>
+		<div style="display: flex;">
+			<div style="flex: 1; height: calc(100vh - 4em); position: relative;">
+				<div>THREE.js</div>
+				<div id="viewer-1" style="width: 100%; height: 100%"></div>
+			</div>
+			<div style="flex: 1; height: calc(100vh - 4em); position: relative;">
+				<div>lightgl.js</div>
+				<div id="viewer-2" style="width: 100%; height: 100%"></div>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			var gCurrentFile,
+				gProcessor;
+
+			// OpenJsCad.AlertUserOfUncaughtExceptions();
+
+			OpenJsCad.workerDeps = [
+				'csg.js', 'openjscad.js', 'openscad.js'
+			];
+
+			function getParameterDefinitions() {
+				return [
+					{ name: '_version', caption: 'Version', type: 'text', initial: "1.0.0" },
+					{
+						name: '_output',
+						caption: 'What to show :',
+						type: 'choice',
+						values: [0,1,2,-1, 4],
+						initial: 4,
+						captions: [
+							"-----", //0
+							"sphere", //1
+							"sphere + cube", //2
+							"sphere - cube", //-1
+							"sphere and cube", //4
+						]
+					},
+					{ name: '_resolution', caption: 'Resolution:', type: 'int', initial: 16 },
+				]
+			}
+
+
+			function main (params) {
+				console.log (JSON.stringify (params));
+				var cube = CSG.roundedCube({radius: 10, roundradius: 2, resolution: params._resolution});
+				var sphere = CSG.sphere({radius: 10, resolution: params._resolution}).translate([5, 5, 5]);
+				if (params._output === "4") {
+					return [cube, sphere];
+				} else if (params._output === "0") {
+					return [];
+				} else if (params._output === "1") {
+					return sphere;
+				} else if (params._output === "-1") {
+					return difference(sphere, cube);
+				}
+				return cube.union(sphere);
+			}
+
+			var jscadscript = getParameterDefinitions.toString() + main.toString(),
+				filename = 'test.jscad';
+
+
+
+			gProcessor = new OpenJsCad.Processor(
+				document.getElementById("viewer-1"),
+				{viewer: {
+					"engine": "ThreeEngine",
+					"solid": {
+						"faceColor": "rgba(129, 211, 45, 1)"
+					}
+				}
+				}
+			);
+			// gProcessor.setDebugging( true );
+
+			gProcessor.setJsCad( jscadscript, 'samples/logo.jscad' );
+
+			var gProcessor2 = new OpenJsCad.Processor(
+				document.getElementById("viewer-2"),
+				{viewer: {
+					"engine": "LightJSEngine",
+					"solid": {
+						"faceColor": "rgba(129, 211, 45, 1)"
+					}
+				}
+				}
+			);
+
+			gProcessor2.setJsCad( jscadscript, 'samples/logo.jscad' );
+		</script>
+	</body>
+</html>
